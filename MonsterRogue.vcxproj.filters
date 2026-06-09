@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6D3F78B0-8F87-4E8B-A1FE-34DA14579EC7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{CC272CBA-466D-4EB7-A2F8-C3D12F26C6A1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{B86CBE12-5F42-43FD-ABEF-C73251F8A8F8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{3864A974-C963-42C4-B72B-63BFCD744E42}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\battle.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\database.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\data_loader.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\game.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\input.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\inventory.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\main.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\monster_book.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\path_utils.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\player.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\ranking.c"><Filter>Source Files</Filter></ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\battle.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\database.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\data_loader.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\game.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\input.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\inventory.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\models.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\monster_book.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\path_utils.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\player.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\ranking.h"><Filter>Header Files</Filter></ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="data\item.txt"><Filter>Data</Filter></Text>
+    <Text Include="data\monster.txt"><Filter>Data</Filter></Text>
+    <Text Include="data\stage.txt"><Filter>Data</Filter></Text>
+    <Text Include="data\unlock.txt"><Filter>Data</Filter></Text>
+    <Text Include="docs\DESIGN.md"><Filter>Docs</Filter></Text>
+    <Text Include="sql\schema.sql"><Filter>Docs</Filter></Text>
+    <Text Include="README.md"><Filter>Docs</Filter></Text>
+  </ItemGroup>
+</Project>

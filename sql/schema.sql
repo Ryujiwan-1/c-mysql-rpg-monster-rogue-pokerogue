@@ -1,0 +1,69 @@
+CREATE DATABASE IF NOT EXISTS monster_rogue
+  DEFAULT CHARACTER SET utf8mb4
+  DEFAULT COLLATE utf8mb4_unicode_ci;
+
+USE monster_rogue;
+
+CREATE TABLE IF NOT EXISTS account (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(50) NOT NULL,
+    nickname VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS player (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT,
+    nickname VARCHAR(50) NOT NULL UNIQUE,
+    level INT NOT NULL DEFAULT 1,
+    exp INT NOT NULL DEFAULT 0,
+    gold INT NOT NULL DEFAULT 0,
+    best_floor INT NOT NULL DEFAULT 1,
+    material INT NOT NULL DEFAULT 0,
+    current_floor INT NOT NULL DEFAULT 1,
+    max_hp INT NOT NULL DEFAULT 100,
+    base_atk INT NOT NULL DEFAULT 10,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS inventory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    player_id INT NOT NULL,
+    item_name VARCHAR(100) NOT NULL,
+    rarity VARCHAR(20) NOT NULL,
+    atk INT NOT NULL DEFAULT 0,
+    hp INT NOT NULL DEFAULT 0,
+    equip TINYINT(1) NOT NULL DEFAULT 0,
+    enhance_level INT NOT NULL DEFAULT 0,
+    FOREIGN KEY (player_id) REFERENCES player(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS monster_book (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    player_id INT NOT NULL,
+    monster_id INT NOT NULL,
+    discover TINYINT(1) NOT NULL DEFAULT 0,
+    kill_count INT NOT NULL DEFAULT 0,
+    UNIQUE KEY uq_book_player_monster (player_id, monster_id),
+    FOREIGN KEY (player_id) REFERENCES player(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS run_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    player_id INT NOT NULL,
+    floor INT NOT NULL,
+    score INT NOT NULL,
+    play_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (player_id) REFERENCES player(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ranking (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nickname VARCHAR(50) NOT NULL,
+    best_floor INT NOT NULL,
+    score INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
