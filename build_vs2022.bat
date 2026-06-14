@@ -10,10 +10,20 @@ if not defined MySqlDir (
     set "MySqlDir=%ROOT%mysql57\server"
 )
 
+rem If the project-local MySQL 5.7 files were cleaned, restore them first.
+rem This prevents the common "mysql.h not found" build error.
+if not exist "%MySqlDir%\include\mysql.h" (
+    if exist "%ROOT%setup_mysql57.bat" (
+        echo [INFO] MySQL 5.7 files are missing. Running setup_mysql57.bat...
+        call "%ROOT%setup_mysql57.bat"
+        if errorlevel 1 exit /b 1
+    )
+)
+
 rem Check the MySQL headers and import library needed by MSVC.
 if not exist "%MySqlDir%\include\mysql.h" (
     echo [ERROR] mysql.h not found: %MySqlDir%\include\mysql.h
-    echo Set MySqlDir to your MySQL Connector or MySQL Server folder.
+    echo Run setup_mysql57.bat, or set MySqlDir to your MySQL Connector or MySQL Server folder.
     exit /b 1
 )
 
