@@ -12,6 +12,10 @@
 
 static void gain_exp(Player *player, int amount)
 {
+    /*
+     * 전투 승리 후 경험치를 지급하고, 필요한 경험치를 넘으면 레벨업한다.
+     * 레벨업 시 최대 HP와 기본 공격력을 올려 성장 체감을 만든다.
+     */
     int need;
 
     player->exp += amount;
@@ -31,6 +35,10 @@ static void gain_exp(Player *player, int amount)
 
 static MonsterDef *pick_stage_monster(GameState *state, int floor)
 {
+    /*
+     * 현재 층에 맞는 몬스터 후보를 고르는 함수이다.
+     * stage.txt의 규칙을 참고하되, 아직 도감에 발견되지 않은 몬스터는 등장하지 않게 한다.
+     */
     StageRule *selected = NULL;
     MonsterDef *candidates[MAX_STAGE_MONSTERS];
     int count = 0;
@@ -42,6 +50,7 @@ static MonsterDef *pick_stage_monster(GameState *state, int floor)
         }
     }
 
+    /* 현재 층에 적용되는 stage 규칙에서 등장 가능한 몬스터 후보를 모은다. */
     if (selected != NULL) {
         for (i = 0; i < selected->monster_count; i++) {
             MonsterDef *monster = find_monster_by_name(&state->data, selected->monster_names[i]);
@@ -52,6 +61,10 @@ static MonsterDef *pick_stage_monster(GameState *state, int floor)
         }
     }
 
+    /*
+     * stage 규칙에서 후보를 못 찾으면 발견된 몬스터 전체를 후보로 사용한다.
+     * 이렇게 하면 데이터 파일이 조금 부족해도 전투가 멈추지 않는다.
+     */
     if (count == 0) {
         for (i = 0; i < state->data.monster_count && count < MAX_STAGE_MONSTERS; i++) {
             if (is_monster_discovered(state, state->data.monsters[i].id)) {
@@ -70,6 +83,10 @@ static MonsterDef *pick_stage_monster(GameState *state, int floor)
 
 Monster create_scaled_monster(GameState *state, int floor)
 {
+    /*
+     * MonsterDef는 기본 능력치만 갖고 있으므로, 실제 전투용 Monster를 새로 만든다.
+     * 층이 올라갈수록 hp_scale/atk_scale이 커져 같은 몬스터도 점점 강해진다.
+     */
     MonsterDef *def = pick_stage_monster(state, floor);
     Monster monster;
     /* 스탯 보상이 5층마다 나오므로 몬스터도 5층 단위로 한 번 더 강해진다. */
@@ -88,6 +105,7 @@ Monster create_scaled_monster(GameState *state, int floor)
 
 static void show_battle_status(Player *player, Monster *monster)
 {
+    /* 매 턴마다 플레이어와 몬스터의 현재 HP/공격력을 출력한다. */
     printf("\n%s 등장!\n", monster->name);
     printf("몬스터 HP: %d / %d  ATK: %d\n", monster->hp, monster->max_hp, monster->atk);
     printf("플레이어 HP: %d / %d  ATK: %d\n", player->hp,
@@ -96,6 +114,10 @@ static void show_battle_status(Player *player, Monster *monster)
 
 static void player_reward(GameState *state)
 {
+    /*
+     * 5층마다 제공되는 성장 보상이다.
+     * 공격력/체력/강화 재료 중 하나를 고르게 해서 플레이 방향을 선택하게 한다.
+     */
     int choice;
     Player *player = &state->player;
 
@@ -124,6 +146,10 @@ static void player_reward(GameState *state)
 
 int run_battle(GameState *state)
 {
+    /*
+     * 한 번의 전투 전체를 처리한다.
+     * 반환값은 1이면 승리, 0이면 패배이며 game.c가 이 결과로 층 진행 또는 사망 처리를 한다.
+     */
     Player *player = &state->player;
     Monster monster = create_scaled_monster(state, state->current_floor);
     int guarding = 0;
@@ -146,6 +172,12 @@ int run_battle(GameState *state)
 
         guarding = 0;
 
+        /*
+         * 선택지 처리:
+         * 1. 일반 공격
+         * 2. 강공격: 더 큰 피해
+         * 3. 응급 회복: HP 회복, 대신 이번 턴 반격 피해를 절반만 받음
+         */
         if (choice == 2) {
             damage = (int)(get_player_total_atk(player) * 1.6);
             monster.hp -= damage;
@@ -184,6 +216,10 @@ int run_battle(GameState *state)
         return 0;
     }
 
+    /*
+     * 승리 보상 처리 순서:
+     * 도감 처치 수 증가 -> 경험치/골드 지급 -> 확률 장비 드랍 -> 5층 보상 -> 해금 체크
+     */
     printf("\n승리!\n");
     add_monster_kill(state, monster.id);
     gain_exp(player, 40 + state->current_floor * 5);

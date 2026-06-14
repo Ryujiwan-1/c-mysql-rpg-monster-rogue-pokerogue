@@ -8,6 +8,10 @@
 
 static Rarity roll_rarity(void)
 {
+    /*
+     * 장비 등급을 확률로 뽑는다.
+     * 낮은 등급은 자주 나오고, 전설/신화 등급은 낮은 확률로 나오게 설정했다.
+     */
     int roll = rand() % 100;
 
     if (roll < 45) return RARITY_COMMON;
@@ -20,6 +24,7 @@ static Rarity roll_rarity(void)
 
 static int rarity_bonus(Rarity rarity)
 {
+    /* 등급이 높을수록 장비 기본 옵션에 더 큰 보너스를 준다. */
     switch (rarity) {
     case RARITY_COMMON: return 0;
     case RARITY_UNCOMMON: return 3;
@@ -33,6 +38,7 @@ static int rarity_bonus(Rarity rarity)
 
 int get_rarity_material(Rarity rarity)
 {
+    /* 장비를 분해하거나 강화할 때 등급별 재료 가치를 계산한다. */
     switch (rarity) {
     case RARITY_COMMON: return 1;
     case RARITY_UNCOMMON: return 2;
@@ -46,6 +52,7 @@ int get_rarity_material(Rarity rarity)
 
 const char *rarity_to_string(Rarity rarity)
 {
+    /* enum 등급 값을 화면 출력과 DB 저장에 사용할 한글 문자열로 바꾼다. */
     switch (rarity) {
     case RARITY_COMMON: return "일반";
     case RARITY_UNCOMMON: return "고급";
@@ -59,6 +66,10 @@ const char *rarity_to_string(Rarity rarity)
 
 static void remove_item(Player *player, int index)
 {
+    /*
+     * 배열 중간의 장비를 삭제하면 뒤 장비들을 한 칸씩 앞으로 당긴다.
+     * C 배열은 자동으로 빈 칸을 정리해주지 않기 때문에 직접 이동해야 한다.
+     */
     int i;
 
     for (i = index; i < player->inventory_count - 1; i++) {
@@ -69,6 +80,10 @@ static void remove_item(Player *player, int index)
 
 static void equip_item(Player *player, int index)
 {
+    /*
+     * 현재 구조는 장비를 하나만 착용하는 방식이다.
+     * 먼저 모든 장비의 equipped를 0으로 만들고 선택한 장비만 1로 바꾼다.
+     */
     int i;
 
     for (i = 0; i < player->inventory_count; i++) {
@@ -80,6 +95,7 @@ static void equip_item(Player *player, int index)
 
 static void disassemble_item(Player *player, int index)
 {
+    /* 장비를 분해하면 등급과 강화 단계에 따라 강화 재료를 얻고 장비는 삭제된다. */
     Item *item = &player->inventory[index];
     int gain = get_rarity_material(item->rarity) + item->enhance_level;
 
@@ -91,6 +107,10 @@ static void disassemble_item(Player *player, int index)
 
 static void enhance_item(Player *player, int index)
 {
+    /*
+     * 장비 강화는 재료를 소모해서 공격력과 체력 옵션을 올린다.
+     * 강화 단계가 높아질수록 비용이 증가한다.
+     */
     Item *item = &player->inventory[index];
     int cost = (item->enhance_level + 1) * 2 + get_rarity_material(item->rarity);
     int atk_up = 2 + get_rarity_material(item->rarity);
@@ -111,6 +131,7 @@ static void enhance_item(Player *player, int index)
 
 int get_player_total_atk(Player *player)
 {
+    /* 플레이어 기본 공격력에 착용 장비의 공격력 옵션을 더한다. */
     int i;
     int total = player->base_atk;
 
@@ -125,6 +146,7 @@ int get_player_total_atk(Player *player)
 
 int get_player_total_max_hp(Player *player)
 {
+    /* 플레이어 기본 최대 HP에 착용 장비의 HP 옵션을 더한다. */
     int i;
     int total = player->max_hp;
 
@@ -139,6 +161,10 @@ int get_player_total_max_hp(Player *player)
 
 void show_inventory(Player *player)
 {
+    /*
+     * 인벤토리 화면을 출력하고 장비에 대한 행동을 처리한다.
+     * 착용, 버리기, 분해, 강화는 모두 이 함수에서 선택받는다.
+     */
     int i;
     int choice;
     int action;
@@ -201,6 +227,10 @@ void show_inventory(Player *player)
 
 void add_random_equipment(GameState *state, int floor)
 {
+    /*
+     * 전투 승리 시 확률적으로 호출되는 장비 획득 함수이다.
+     * 아이템 원본 데이터에서 하나를 고르고, 현재 층과 등급에 따라 실제 옵션을 만든다.
+     */
     Player *player = &state->player;
     ItemDef *def;
     Item item;
