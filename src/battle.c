@@ -1,5 +1,6 @@
 #include "battle.h"
 
+#include "console_utils.h"
 #include "data_loader.h"
 #include "input.h"
 #include "inventory.h"
@@ -104,7 +105,7 @@ static void player_reward(GameState *state)
     printf("3. 강화 재료 획득 (+5)\n");
     printf("선택: ");
 
-    if (read_int(&choice) != INPUT_OK) {
+    if (read_int(&choice) != INPUT_OK || choice < 1 || choice > 3) {
         choice = 1;
     }
 
@@ -127,10 +128,12 @@ int run_battle(GameState *state)
     Monster monster = create_scaled_monster(state, state->current_floor);
     int guarding = 0;
 
+    clear_screen();
     while (player->hp > 0 && monster.hp > 0) {
         int choice;
         int damage;
 
+        clear_screen();
         show_battle_status(player, &monster);
         printf("\n1. 공격\n");
         printf("2. 스킬(강공격)\n");
@@ -168,10 +171,16 @@ int run_battle(GameState *state)
         damage = guarding ? monster.atk / 2 : monster.atk;
         player->hp -= damage;
         printf("%s의 반격! %d 피해\n", monster.name, damage);
+
+        if (player->hp > 0) {
+            wait_for_enter();
+        }
     }
 
     if (player->hp <= 0) {
         printf("\n플레이어가 쓰러졌습니다.\n");
+        wait_for_enter();
+        clear_screen();
         return 0;
     }
 
@@ -189,5 +198,7 @@ int run_battle(GameState *state)
         player_reward(state);
     }
     check_unlocks(state);
+    wait_for_enter();
+    clear_screen();
     return 1;
 }

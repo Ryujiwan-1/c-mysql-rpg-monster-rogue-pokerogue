@@ -1,5 +1,6 @@
 #include "monster_book.h"
 
+#include "console_utils.h"
 #include "data_loader.h"
 
 #include <stdio.h>
@@ -103,6 +104,7 @@ void show_monster_book(GameState *state)
 {
     int i;
 
+    clear_screen();
     printf("\n===== 몬스터 도감 =====\n");
     printf("\n[등록]\n");
     for (i = 0; i < state->data.monster_count; i++) {
@@ -120,4 +122,7 @@ void show_monster_book(GameState *state)
             printf("???\n");
         }
     }
+
+    wait_for_enter();
+    clear_screen();
 }

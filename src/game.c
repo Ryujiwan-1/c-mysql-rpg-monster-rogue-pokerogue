@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "battle.h"
+#include "console_utils.h"
 #include "data_loader.h"
 #include "database.h"
 #include "input.h"
@@ -69,6 +70,7 @@ static void game_loop(GameState *state, Database *db)
     while (state->running) {
         int choice;
 
+        clear_screen();
         /* 현재 층이 기존 최고 기록보다 높으면 최고 층 기록을 갱신한다. */
         if (state->current_floor > state->player.best_floor) {
             state->player.best_floor = state->current_floor;
@@ -103,14 +105,28 @@ static void game_loop(GameState *state, Database *db)
             int win = run_battle(state);
             if (!win) {
                 int score;
-                /* 사망 시점의 최고 층과 점수를 계산해 세이브/기록/랭킹에 반영한다. */
+                /*
+                 * 사망 시점의 최고 층과 점수를 먼저 계산한다.
+                 * 이 값은 run_history와 ranking에 기록으로 남긴다.
+                 */
                 if (state->current_floor > state->player.best_floor) {
                     state->player.best_floor = state->current_floor;
                 }
                 score = calculate_score(&state->player, state->current_floor);
-                db_save_game_state(db, state);
                 db_save_run(db, &state->player, state->current_floor, score);
+
+                /*
+                 * 죽은 뒤에는 다음 이어하기가 사망한 층/HP/장비 상태에서 시작되면 안 된다.
+                 * 계정과 닉네임은 유지하고, 레벨/경험치/골드/장비/도감/현재 층 같은
+                 * 플레이 진행 정보는 새 게임 상태로 초기화한 뒤 DB에 저장한다.
+                 */
+                start_new_player(state);
+                db_save_game_state(db, state);
+
+                clear_screen();
+                printf("사망하여 플레이 정보가 새 게임 상태로 초기화되었습니다.\n");
                 db_show_ranking(db);
+                wait_for_enter();
                 state->running = 0;
             } else {
                 /* 전투에서 승리하면 다음 층으로 이동하고, 약간의 HP를 회복한다. */
@@ -127,6 +143,7 @@ static void game_loop(GameState *state, Database *db)
         } else if (choice == 4) {
             db_save_game_state(db, state);
             printf("저장 완료\n");
+            wait_for_enter();
         } else if (choice == 5) {
             db_save_game_state(db, state);
             state->running = 0;
@@ -169,6 +186,7 @@ void run_game(void)
             char password[MAX_NAME_LEN];
             char nickname[MAX_NAME_LEN];
 
+            clear_screen();
             printf("\n===== Monster Rogue 계정 =====\n");
             printf("1. 로그인\n");
             printf("2. 회원가입\n");
@@ -209,6 +227,8 @@ void run_game(void)
 
                 if (db_login_account(&db, username, password, &state)) {
                     logged_in = 1;
+                } else {
+                    wait_for_enter();
                 }
             } else if (choice == 2) {
                 printf("사용할 아이디: ");
@@ -227,12 +247,14 @@ void run_game(void)
                     continue;
                 }
                 db_register_account(&db, username, password, nickname);
+                wait_for_enter();
             } else if (choice == 3) {
                 program_running = 0;
             }
             continue;
         }
 
+        clear_screen();
         printf("\n===== Monster Rogue =====\n");
         printf("계정: %s / 닉네임: %s\n", state.account_name, state.player.nickname);
         printf("1. 게임 시작/이어하기\n");
@@ -260,12 +282,16 @@ void run_game(void)
             start_new_player(&state);
             db_save_game_state(&db, &state);
             printf("계정 세이브를 새 게임으로 초기화했습니다.\n");
+            wait_for_enter();
         } else if (choice == 3) {
+            clear_screen();
             db_show_ranking(&db);
+            wait_for_enter();
         } else if (choice == 4) {
             db_save_game_state(&db, &state);
             logged_in = 0;
             printf("로그아웃했습니다.\n");
+            wait_for_enter();
         } else if (choice == 5) {
             db_save_game_state(&db, &state);
             program_running = 0;

@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\battle.c"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="src\console_utils.c"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="src\database.c"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="src\data_loader.c"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="src\game.c"><Filter>Source Files</Filter></ClCompile>
@@ -29,6 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\battle.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="include\console_utils.h"><Filter>Header Files</Filter></ClInclude>
     <ClInclude Include="include\database.h"><Filter>Header Files</Filter></ClInclude>
     <ClInclude Include="include\data_loader.h"><Filter>Header Files</Filter></ClInclude>
     <ClInclude Include="include\game.h"><Filter>Header Files</Filter></ClInclude>

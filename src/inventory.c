@@ -1,4 +1,5 @@
 #include "inventory.h"
+#include "console_utils.h"
 #include "input.h"
 
 #include <stdio.h>
@@ -142,10 +143,12 @@ void show_inventory(Player *player)
     int choice;
     int action;
 
+    clear_screen();
     printf("\n===== 인벤토리 =====\n");
     printf("강화 재료: %d\n", player->material);
     if (player->inventory_count == 0) {
         printf("보유 장비가 없습니다.\n");
+        wait_for_enter();
         return;
     }
 
@@ -159,10 +162,12 @@ void show_inventory(Player *player)
 
     printf("선택할 장비 번호 입력(0 취소): ");
     if (read_int(&choice) != INPUT_OK) {
+        clear_screen();
         return;
     }
 
     if (choice <= 0 || choice > player->inventory_count) {
+        clear_screen();
         return;
     }
 
@@ -175,6 +180,7 @@ void show_inventory(Player *player)
     printf("선택: ");
 
     if (read_int(&action) != INPUT_OK) {
+        clear_screen();
         return;
     }
 
@@ -188,6 +194,9 @@ void show_inventory(Player *player)
     } else if (action == 4) {
         enhance_item(player, choice);
     }
+
+    wait_for_enter();
+    clear_screen();
 }
 
 void add_random_equipment(GameState *state, int floor)
